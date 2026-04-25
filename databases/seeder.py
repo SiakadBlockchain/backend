@@ -1,5 +1,5 @@
-from database import SessionLocal
-from models import User, Wallet, University, Student, Diploma, Transaction, VerificationLog
+from databases.connection import SessionLocal
+from models.models import User, Wallet, University, Student, Diploma, Transaction, VerificationLog
 
 from datetime import datetime
 import uuid
@@ -84,17 +84,8 @@ def seed_data():
         )
         session.add(tx)
 
-        log = VerificationLog(
-            id=generate_uuid(),
-            document_hash=diploma.document_hash,
-            result="valid",
-            checked_at=datetime.now(),
-            ip_address="127.0.0.1"
-        )
-        session.add(log)
-
         session.commit()
-        print("✅ Seeder berhasil!")
+        print("Seeding data dummy successfully!")
 
     except Exception as e:
         session.rollback()

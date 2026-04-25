@@ -3,7 +3,7 @@ from sqlalchemy.dialects.mysql import CHAR
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 import uuid
 
-from database import engine
+from databases.connection import engine
 
 Base = declarative_base()
 
@@ -17,8 +17,8 @@ class User(Base):
     name = Column(String(255))
     email = Column(String(255), unique=True)
     password_hash = Column(Text)
-    role = Column(Enum('admin', 'staff', 'validator'))
-    university_id = Column(CHAR(36), ForeignKey("universities.id"))
+    role = Column(Enum('admin', 'university', 'validator'))
+    university_id = Column(CHAR(36), ForeignKey("universities.id"), nullable=True)
     created_at = Column(TIMESTAMP)
 
     university = relationship("University", back_populates="users")
@@ -55,6 +55,7 @@ class Student(Base):
 
     id = Column(CHAR(36), primary_key=True, default=generate_uuid)
     name = Column(String(255))
+    public_key = Column(Text)
     nim = Column(String(100), unique=True)
     university_id = Column(CHAR(36), ForeignKey("universities.id"))
     created_at = Column(TIMESTAMP)
@@ -75,10 +76,13 @@ class Diploma(Base):
     ipfs_cid = Column(Text)
     document_hash = Column(String(255))
 
+    encrypted_key = Column(Text, nullable=True) # Menyimpan kunci AES yang terenkripsi RSA
+    iv = Column(String(255), nullable=True)
+
     tx_hash = Column(String(255))
     block_number = Column(BigInteger)
 
-    status = Column(Enum('valid', 'revoked'))
+    status = Column(Enum('valid', 'revoked', 'pending'))
 
     issued_at = Column(TIMESTAMP)
     created_at = Column(TIMESTAMP)
@@ -86,11 +90,12 @@ class Diploma(Base):
     student = relationship("Student")
     university = relationship("University")
 
-
 class Transaction(Base):
     __tablename__ = "transactions"
 
     id = Column(CHAR(36), primary_key=True, default=generate_uuid)
+
+    reference_id = Column(CHAR(36), nullable=True)
 
     tx_hash = Column(String(255), unique=True)
 
@@ -110,16 +115,6 @@ class Transaction(Base):
     gas_used = Column(BigInteger)
 
     created_at = Column(TIMESTAMP)
-
-
-class VerificationLog(Base):
-    __tablename__ = "verification_logs"
-
-    id = Column(CHAR(36), primary_key=True, default=generate_uuid)
-    document_hash = Column(String(255))
-    result = Column(Enum('valid', 'invalid'))
-    checked_at = Column(TIMESTAMP)
-    ip_address = Column(String(100))
 
 def init_db():
     Base.metadata.create_all(engine)
