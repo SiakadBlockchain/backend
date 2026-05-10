@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+pydantic[email]
+sqlalchemy
+mysqlclient
+python-dotenv
+python-multipart
+requests
+python-jose[cryptography]
+passlib[bcrypt]
+cryptography
+web3
+eth-account
+flask
