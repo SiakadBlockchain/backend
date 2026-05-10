@@ -4,13 +4,17 @@ import os
 from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from databases.connection import SessionLocal
-from models.models import User
+from models.models import Student, User
 from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
 from typing import Optional
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
 
 router = APIRouter()
 load_dotenv()
@@ -23,6 +27,26 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 security = HTTPBearer()
+
+def generate_rsa_keys():
+    private_key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=2048,
+        backend=default_backend()
+    )
+    
+    private_key_pem = private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption()
+    ).decode('utf-8')
+
+    public_key_pem = private_key.public_key().public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    ).decode('utf-8')
+    
+    return private_key_pem, public_key_pem
 
 def get_db():
     db = SessionLocal()
@@ -74,7 +98,12 @@ def get_current_user(
         )
 
     user_id = payload.get("user_id")
-    user = db.query(User).filter(User.id == user_id).first()
+    user_role = payload.get("role")
+
+    if user_role == "student":
+        user = db.query(Student).filter(Student.id == user_id).first()
+    else:
+        user = db.query(User).filter(User.id == user_id).first()
 
     if not user:
         raise HTTPException(
@@ -124,23 +153,37 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
         )
 
     hashed_password = hash_password(payload.password)
+    
+    private_key_rsa = None
+    public_key_rsa = None
+
+    if payload.role == "university":
+        private_key_rsa, public_key_rsa = generate_rsa_keys()
 
     new_user = User(
         name=payload.name,
         email=payload.email,
         password_hash=hashed_password,
         role=payload.role,
-        university_id=payload.university_id if payload.university_id else None
+        university_id=payload.university_id if payload.university_id else None,
+        public_key=public_key_rsa if payload.role == "university" else None,
+        created_at=datetime.utcnow()
     )
 
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
 
-    return {
-        "message": "Register success",
+    response_data = {
+        "message": "Registration successful",
         "data": UserData.model_validate(new_user)
     }
+
+    if payload.role == "university":
+        response_data["private_key"] = private_key_rsa
+        response_data["private_key_instruction"] = "Store this key securely. This key is required to sign diplomas."
+
+    return response_data
 
 # =========================
 # LOGIN
@@ -148,11 +191,16 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
 @router.post("/login")
 def login(payload: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == payload.email).first()
+    is_student = False
+
+    if not user:
+        user = db.query(Student).filter(Student.email == payload.email).first()
+        is_student = True
 
     if not user:
         raise HTTPException(
             status_code=404,
-            detail={"message": "User not found"}
+            detail={"message": "Email not registered"}
         )
 
     if not verify_password(payload.password, user.password_hash):
@@ -160,29 +208,33 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
             status_code=401,
             detail={"message": "Invalid credentials"}
         )
+    
+    role = "student" if is_student else user.role
+    university_id = None if is_student else user.university_id
 
-    if user.role == "university" and not user.university_id:
+    if role == "university" and not university_id:
         raise HTTPException(
             status_code=400,
-            detail={"message": "University user must have university_id"}
+            detail={"message": "University user must have a university_id"}
         )
 
     access_token = create_access_token({
         "user_id": user.id,
         "email": user.email,
-        "role": user.role,
-        "university_id": user.university_id
+        "role": role,
+        "university_id": university_id
     })
 
     return {
-        "message": "Login success",
+        "message": "Login successful",
         "data": {
             "user": {
                 "id": user.id,
                 "name": user.name,
                 "email": user.email,
-                "role": user.role,
-                "university_id": user.university_id
+                "role": role,
+                "university_id": university_id,
+                "is_phone_verified": getattr(user, 'is_phone_verified', None) if is_student else None
             },
             "access_token": access_token,
             "token_type": "bearer"

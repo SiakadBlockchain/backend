@@ -15,41 +15,36 @@ def get_db():
     finally:
         db.close()
 
-
 # =========================
 # SCHEMA
 # =========================
 class UniversityCreate(BaseModel):
     name: str
-    accreditation: str  # A, B, C
-    wallet_address: Optional[str] = None
-    is_active: bool = True
+    accreditation: str
 
 class UniversityData(BaseModel):
     id: str
     name: str
     accreditation: str
-    wallet_address: Optional[str] = None
-    is_active: bool
+    created_at: Optional[datetime]
 
     class Config:
         from_attributes = True
-
-class ResponseModel(BaseModel):
-    message: str
-    data: Optional[dict] = None
-
 
 # =========================
 # CREATE UNIVERSITY
 # =========================
 @router.post("/")
 def create_university(university: UniversityCreate, db: Session = Depends(get_db)):
+    if university.accreditation not in ['A', 'B', 'C']:
+        raise HTTPException(
+            status_code=400, 
+            detail={"message": "Accreditation must be A, B, or C"}
+        )
+
     new_university = University(
         name=university.name,
         accreditation=university.accreditation,
-        wallet_address=university.wallet_address,
-        is_active=university.is_active,
         created_at=datetime.utcnow()
     )
 
@@ -61,7 +56,6 @@ def create_university(university: UniversityCreate, db: Session = Depends(get_db
         "message": "University created successfully",
         "data": UniversityData.model_validate(new_university)
     }
-
 
 # =========================
 # GET ALL UNIVERSITIES
@@ -114,10 +108,14 @@ def update_university(university_id: str, updated: UniversityCreate, db: Session
             detail={"message": "University not found"}
         )
 
+    if updated.accreditation not in ['A', 'B', 'C']:
+        raise HTTPException(
+            status_code=400, 
+            detail={"message": "Accreditation must be A, B, or C"}
+        )
+
     university.name = updated.name
     university.accreditation = updated.accreditation
-    university.wallet_address = updated.wallet_address
-    university.is_active = updated.is_active
 
     db.commit()
     db.refresh(university)

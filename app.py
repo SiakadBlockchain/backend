@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import users, universities, students, diplomas, wallets, transactions, auth
+from routes import users, universities, students, diplomas, transactions, auth, studies, wallets
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="SIAKAD Blockchain API Gateway")
@@ -33,15 +33,15 @@ app.include_router(
 )
 
 app.include_router(
-    diplomas.router,
-    prefix=f"{API_PREFIX}/diplomas",
-    tags=["Diplomas"]
+    studies.router,
+    prefix=f"{API_PREFIX}/studies",
+    tags=["Studies"]
 )
 
 app.include_router(
-    wallets.router,
-    prefix=f"{API_PREFIX}/wallets",
-    tags=["Wallets"]
+    diplomas.router,
+    prefix=f"{API_PREFIX}/diplomas",
+    tags=["Diplomas"]
 )
 
 app.include_router(
@@ -54,6 +54,12 @@ app.include_router(
     auth.router,
     prefix=f"{API_PREFIX}/auth",
     tags=["Authentication"]
+)
+
+app.include_router(
+    wallets.router,
+    prefix=f"{API_PREFIX}/wallets",
+    tags=["Wallets"]
 )
 
 @app.get(f"{API_PREFIX}/")

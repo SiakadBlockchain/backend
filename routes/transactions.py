@@ -1,5 +1,6 @@
 import os
 import json
+from datetime import datetime
 
 from web3 import Web3
 from dotenv import load_dotenv
@@ -37,13 +38,13 @@ def get_db():
 # =========================
 class TransactionData(BaseModel):
     id: str
+    reference_id: Optional[str] = None
     tx_hash: Optional[str] = None
-    reference_id: str
     tx_type: str
-    wallet_address: str
     status: str
     block_number: Optional[int] = None
     gas_used: Optional[int] = None
+    created_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -62,7 +63,7 @@ def get_transactions(page: int = 1, limit: int = 10, db: Session = Depends(get_d
 
         total = db.query(Transaction).count()
         transactions = db.query(Transaction)\
-            .order_by(Transaction.id.desc())\
+            .order_by(Transaction.created_at.desc())\
             .offset(skip).limit(limit).all()
 
         validated_data = [TransactionData.model_validate(t) for t in transactions]
@@ -97,12 +98,21 @@ def get_transaction(transaction_id: str, db: Session = Depends(get_db)):
         "data": TransactionData.model_validate(transaction)
     }
 
+# =========================
+# APPROVE TRANSACTION
+# =========================
 @router.post("/{transaction_id}/approve")
 async def approve_transaction(transaction_id: str, db: Session = Depends(get_db)):
     tx_record = db.query(Transaction).filter(Transaction.id == transaction_id).first()
+    
     if not tx_record or tx_record.status != 'pending':
         raise HTTPException(status_code=404, detail="Pending transaction not found")
+        
     diploma = db.query(Diploma).filter(Diploma.id == tx_record.reference_id).first()
+    
+    if not diploma:
+        raise HTTPException(status_code=404, detail="Associated diploma record not found")
+
     try:
         issued_at_ts = int(diploma.issued_at.timestamp())
         nonce = w3.eth.get_transaction_count(account.address)
@@ -125,10 +135,12 @@ async def approve_transaction(transaction_id: str, db: Session = Depends(get_db)
         signed_tx = w3.eth.account.sign_transaction(tx, private_key=PRIVATE_KEY)
         tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+        
         tx_record.status = 'success'
         tx_record.tx_hash = tx_hash.hex()
         tx_record.block_number = tx_receipt.blockNumber
         tx_record.gas_used = tx_receipt.gasUsed
+        
         diploma.status = 'valid'
         diploma.tx_hash = tx_hash.hex()
         diploma.block_number = tx_receipt.blockNumber
@@ -137,6 +149,7 @@ async def approve_transaction(transaction_id: str, db: Session = Depends(get_db)
         return {"message": "Transaction approved and anchored to blockchain"}
 
     except Exception as e:
+        db.rollback()
         tx_record.status = 'failed'
         db.commit()
         raise HTTPException(status_code=500, detail=f"Approval Failed: {str(e)}")
