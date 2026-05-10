@@ -4,6 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="SIAKAD Blockchain API Gateway")
 
+origins = [
+    "http://103.143.71.175:8001",
+    "http://localhost:8001",
+]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
