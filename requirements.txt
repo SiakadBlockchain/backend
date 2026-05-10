@@ -12,3 +12,4 @@ cryptography
 web3
 eth-account
 flask
+pymysql
