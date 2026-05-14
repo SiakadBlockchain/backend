@@ -34,7 +34,7 @@ class UniversityData(BaseModel):
 # =========================
 # CREATE UNIVERSITY
 # =========================
-@router.post("/")
+@router.post("")
 def create_university(university: UniversityCreate, db: Session = Depends(get_db)):
     if university.accreditation not in ['A', 'B', 'C']:
         raise HTTPException(
@@ -60,7 +60,7 @@ def create_university(university: UniversityCreate, db: Session = Depends(get_db
 # =========================
 # GET ALL UNIVERSITIES
 # =========================
-@router.get("/")
+@router.get("")
 def get_universities(page: int = 1, limit: int = 10, db: Session = Depends(get_db)):
     skip = (page - 1) * limit
 
@@ -80,7 +80,7 @@ def get_universities(page: int = 1, limit: int = 10, db: Session = Depends(get_d
 # =========================
 # GET UNIVERSITY BY ID
 # =========================
-@router.get("/{university_id}")
+@router.get("{university_id}")
 def get_university(university_id: str, db: Session = Depends(get_db)):
     university = db.query(University).filter(University.id == university_id).first()
 
@@ -98,7 +98,7 @@ def get_university(university_id: str, db: Session = Depends(get_db)):
 # =========================
 # UPDATE UNIVERSITY
 # =========================
-@router.put("/{university_id}")
+@router.put("{university_id}")
 def update_university(university_id: str, updated: UniversityCreate, db: Session = Depends(get_db)):
     university = db.query(University).filter(University.id == university_id).first()
 
@@ -128,7 +128,7 @@ def update_university(university_id: str, updated: UniversityCreate, db: Session
 # =========================
 # DELETE UNIVERSITY
 # =========================
-@router.delete("/{university_id}")
+@router.delete("{university_id}")
 def delete_university(university_id: str, db: Session = Depends(get_db)):
     university = db.query(University).filter(University.id == university_id).first()
 
