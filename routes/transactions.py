@@ -56,7 +56,7 @@ class ResponseModel(BaseModel):
 # =========================
 # GET ALL TRANSACTIONS
 # =========================
-@router.get("/")
+@router.get("")
 def get_transactions(page: int = 1, limit: int = 10, db: Session = Depends(get_db)):
     try:
         skip = (page - 1) * limit

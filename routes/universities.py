@@ -34,7 +34,7 @@ class UniversityData(BaseModel):
 # =========================
 # CREATE UNIVERSITY
 # =========================
-@router.post("/")
+@router.post("")
 def create_university(university: UniversityCreate, db: Session = Depends(get_db)):
     if university.accreditation not in ['A', 'B', 'C']:
         raise HTTPException(
@@ -60,7 +60,7 @@ def create_university(university: UniversityCreate, db: Session = Depends(get_db
 # =========================
 # GET ALL UNIVERSITIES
 # =========================
-@router.get("/")
+@router.get("")
 def get_universities(page: int = 1, limit: int = 10, db: Session = Depends(get_db)):
     skip = (page - 1) * limit
 

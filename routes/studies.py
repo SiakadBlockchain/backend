@@ -44,7 +44,7 @@ class StudyData(StudyBase):
 # =========================
 # CREATE STUDY
 # =========================
-@router.post("/")
+@router.post("")
 def create_study(study: StudyCreate, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.id == study.student_id).first()
     if not student:
@@ -78,7 +78,7 @@ def create_study(study: StudyCreate, db: Session = Depends(get_db)):
 # =========================
 # GET ALL STUDIES
 # =========================
-@router.get("/")
+@router.get("")
 def get_studies(page: int = 1, limit: int = 10, db: Session = Depends(get_db)):
     skip = (page - 1) * limit
     total = db.query(Study).count()

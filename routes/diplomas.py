@@ -142,7 +142,7 @@ class DiplomaData(BaseModel):
 # CREATE DIPLOMA
 # =========================
 
-@router.post("/")
+@router.post("")
 async def create_diploma(
     studies_id: str = Form(...),
     graduationYear: str = Form(...),
@@ -255,7 +255,7 @@ async def create_diploma(
 # GET DIPLOMAS
 # =========================
 
-@router.get("/")
+@router.get("")
 def get_diplomas(page: int = 1, limit: int = 10, db: Session = Depends(get_db)):
     skip = (page - 1) * limit
     total = db.query(Diploma).count()

@@ -56,7 +56,7 @@ class ResponseModel(BaseModel):
 # =========================
 # CREATE USER
 # =========================
-@router.post("/")
+@router.post("")
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
@@ -88,7 +88,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 # =========================
 # GET ALL USERS
 # =========================
-@router.get("/")
+@router.get("")
 def get_users(page: int = 1, limit: int = 10, db: Session = Depends(get_db)):
     skip = (page - 1) * limit
 
