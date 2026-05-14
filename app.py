@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from routes import users, universities, students, diplomas, transactions, auth, studies, wallets
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="SIAKAD Blockchain API Gateway")
+app = FastAPI(title="SIAKAD Blockchain API Gateway", redirect_slashes=False)
 
 origins = [
     "http://103.143.71.175:8001",
