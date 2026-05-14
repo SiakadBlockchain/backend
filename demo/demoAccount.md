@@ -13,7 +13,7 @@
 # Student Account
 
 > Username  : Fitrah Septiandwi Sensi
-> Email     : fitrah@gmail.com
+> Email     : fitrahqareem99@gmail.com
 > Password  : password
 > Phone     : 089530056181
 
