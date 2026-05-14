@@ -56,7 +56,7 @@ class ResponseModel(BaseModel):
 # =========================
 # GET ALL TRANSACTIONS
 # =========================
-@router.get("")
+@router.get("/")
 def get_transactions(page: int = 1, limit: int = 10, db: Session = Depends(get_db)):
     try:
         skip = (page - 1) * limit
@@ -83,7 +83,7 @@ def get_transactions(page: int = 1, limit: int = 10, db: Session = Depends(get_d
 # =========================
 # GET TRANSACTION BY ID
 # =========================
-@router.get("{transaction_id}")
+@router.get("/{transaction_id}")
 def get_transaction(transaction_id: str, db: Session = Depends(get_db)):
     transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
 
@@ -101,7 +101,7 @@ def get_transaction(transaction_id: str, db: Session = Depends(get_db)):
 # =========================
 # APPROVE TRANSACTION
 # =========================
-@router.post("{transaction_id}/approve")
+@router.post("/{transaction_id}/approve")
 async def approve_transaction(transaction_id: str, db: Session = Depends(get_db)):
     tx_record = db.query(Transaction).filter(Transaction.id == transaction_id).first()
     

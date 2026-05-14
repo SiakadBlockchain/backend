@@ -103,7 +103,7 @@ class StudentData(BaseModel):
 # =========================
 # CREATE STUDENT (REGISTER)
 # =========================
-@router.post("")
+@router.post("/")
 def register_student(
     payload: StudentCreate, 
     background_tasks: BackgroundTasks, 
@@ -154,7 +154,7 @@ def register_student(
 # =========================
 # GET ALL STUDENTS
 # =========================
-@router.get("")
+@router.get("/")
 def get_students(page: int = 1, limit: int = 10, db: Session = Depends(get_db)):
     skip = (page - 1) * limit
     total = db.query(Student).count()
@@ -173,7 +173,7 @@ def get_students(page: int = 1, limit: int = 10, db: Session = Depends(get_db)):
 # =========================
 # GET STUDENT BY ID
 # =========================
-@router.get("{student_id}", response_model=None)
+@router.get("/{student_id}", response_model=None)
 def get_student(student_id: str, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.id == student_id).first()
     
@@ -188,7 +188,7 @@ def get_student(student_id: str, db: Session = Depends(get_db)):
 # =========================
 # GET STUDENT BY KTP NUMBER
 # =========================
-@router.get("ktp/{ktp_number}")
+@router.get("/ktp/{ktp_number}")
 def get_student_by_ktp(ktp_number: str, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.ktp_number == ktp_number).first()
     
@@ -206,7 +206,7 @@ def get_student_by_ktp(ktp_number: str, db: Session = Depends(get_db)):
 # =========================
 # UPDATE STUDENT
 # =========================
-@router.put("{student_id}")
+@router.put("/{student_id}")
 def update_student(student_id: str, payload: StudentUpdate, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.id == student_id).first()
     if not student:
@@ -230,7 +230,7 @@ def update_student(student_id: str, payload: StudentUpdate, db: Session = Depend
 # =========================
 # DELETE STUDENT
 # =========================
-@router.delete("{student_id}")
+@router.delete("/{student_id}")
 def delete_student(student_id: str, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.id == student_id).first()
     if not student:

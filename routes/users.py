@@ -56,7 +56,7 @@ class ResponseModel(BaseModel):
 # =========================
 # CREATE USER
 # =========================
-@router.post("")
+@router.post("/")
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
@@ -88,7 +88,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 # =========================
 # GET ALL USERS
 # =========================
-@router.get("")
+@router.get("/")
 def get_users(page: int = 1, limit: int = 10, db: Session = Depends(get_db)):
     skip = (page - 1) * limit
 
@@ -109,7 +109,7 @@ def get_users(page: int = 1, limit: int = 10, db: Session = Depends(get_db)):
 # =========================
 # GET USER BY ID
 # =========================
-@router.get("{user_id}")
+@router.get("/{user_id}")
 def get_user(user_id: str, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
 
@@ -128,7 +128,7 @@ def get_user(user_id: str, db: Session = Depends(get_db)):
 # =========================
 # UPDATE USER
 # =========================
-@router.put("{user_id}")
+@router.put("/{user_id}")
 def update_user(user_id: str, updated_user: UserUpdate, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
@@ -150,7 +150,7 @@ def update_user(user_id: str, updated_user: UserUpdate, db: Session = Depends(ge
 # =========================
 # DELETE USER
 # =========================
-@router.delete("{user_id}")
+@router.delete("/{user_id}")
 def delete_user(user_id: str, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
 

@@ -44,7 +44,7 @@ class StudyData(StudyBase):
 # =========================
 # CREATE STUDY
 # =========================
-@router.post("")
+@router.post("/")
 def create_study(study: StudyCreate, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.id == study.student_id).first()
     if not student:
@@ -78,7 +78,7 @@ def create_study(study: StudyCreate, db: Session = Depends(get_db)):
 # =========================
 # GET ALL STUDIES
 # =========================
-@router.get("")
+@router.get("/")
 def get_studies(page: int = 1, limit: int = 10, db: Session = Depends(get_db)):
     skip = (page - 1) * limit
     total = db.query(Study).count()
@@ -97,7 +97,7 @@ def get_studies(page: int = 1, limit: int = 10, db: Session = Depends(get_db)):
 # =========================
 # GET STUDY BY ID
 # =========================
-@router.get("{study_id}")
+@router.get("/{study_id}")
 def get_study(study_id: str, db: Session = Depends(get_db)):
     study = db.query(Study).filter(Study.id == study_id).first()
     if not study:
@@ -111,7 +111,7 @@ def get_study(study_id: str, db: Session = Depends(get_db)):
 # =========================
 # GET STUDY BY NIM
 # =========================
-@router.get("nim/{nim}")
+@router.get("/nim/{nim}")
 def get_study_by_nim(nim: str, db: Session = Depends(get_db)):
     study = db.query(Study).filter(Study.nim == nim).first()
     if not study:
@@ -125,7 +125,7 @@ def get_study_by_nim(nim: str, db: Session = Depends(get_db)):
 # =========================
 # GET STUDY BY STUDENT ID
 # =========================
-@router.get("student/{student_id}")
+@router.get("/student/{student_id}")
 def get_study_by_student_id(student_id: str, db: Session = Depends(get_db)):
     studies = db.query(Study)\
                 .options(joinedload(Study.diplomas))\
@@ -147,7 +147,7 @@ def get_study_by_student_id(student_id: str, db: Session = Depends(get_db)):
 # =========================
 # GET BY UNIVERSITY ID
 # =========================
-@router.get("university/{university_id}")
+@router.get("/university/{university_id}")
 def get_studies_by_university(
     university_id: str, 
     page: int = 1, 
@@ -174,7 +174,7 @@ def get_studies_by_university(
 # =========================
 # UPDATE STUDY
 # =========================
-@router.put("{study_id}")
+@router.put("/{study_id}")
 def update_study(study_id: str, updated: StudyCreate, db: Session = Depends(get_db)):
     study = db.query(Study).filter(Study.id == study_id).first()
     if not study:
@@ -204,7 +204,7 @@ def update_study(study_id: str, updated: StudyCreate, db: Session = Depends(get_
 # =========================
 # DELETE STUDY
 # =========================
-@router.delete("{study_id}")
+@router.delete("/{study_id}")
 def delete_study(study_id: str, db: Session = Depends(get_db)):
     study = db.query(Study).filter(Study.id == study_id).first()
     if not study:

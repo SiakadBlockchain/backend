@@ -142,7 +142,7 @@ class DiplomaData(BaseModel):
 # CREATE DIPLOMA
 # =========================
 
-@router.post("")
+@router.post("/")
 async def create_diploma(
     studies_id: str = Form(...),
     graduationYear: str = Form(...),
@@ -255,7 +255,7 @@ async def create_diploma(
 # GET DIPLOMAS
 # =========================
 
-@router.get("")
+@router.get("/")
 def get_diplomas(page: int = 1, limit: int = 10, db: Session = Depends(get_db)):
     skip = (page - 1) * limit
     total = db.query(Diploma).count()
@@ -267,7 +267,7 @@ def get_diplomas(page: int = 1, limit: int = 10, db: Session = Depends(get_db)):
         "meta": {"page": page, "limit": limit, "total": total}
     }
 
-@router.get("{diploma_id}")
+@router.get("/{diploma_id}")
 def get_diploma(diploma_id: str, db: Session = Depends(get_db)):
     diploma = db.query(Diploma).filter(Diploma.id == diploma_id).first()
     if not diploma:
@@ -278,7 +278,7 @@ def get_diploma(diploma_id: str, db: Session = Depends(get_db)):
         "data": DiplomaData.model_validate(diploma)
     }
 
-@router.get("university/{university_id}")
+@router.get("/university/{university_id}")
 def fetch_diplomas_by_university(
     university_id: str, 
     page: int = 1, 
@@ -305,7 +305,7 @@ def fetch_diplomas_by_university(
 # UPDATE & DELETE
 # =========================
 
-@router.put("{diploma_id}")
+@router.put("/{diploma_id}")
 def update_diploma(diploma_id: str, updated: DiplomaUpdate, db: Session = Depends(get_db)):
     diploma = db.query(Diploma).filter(Diploma.id == diploma_id).first()
     if not diploma:
@@ -328,7 +328,7 @@ def update_diploma(diploma_id: str, updated: DiplomaUpdate, db: Session = Depend
         "data": DiplomaData.model_validate(diploma)
     }
 
-@router.delete("{diploma_id}")
+@router.delete("/{diploma_id}")
 def delete_diploma(diploma_id: str, db: Session = Depends(get_db)):
     diploma = db.query(Diploma).filter(Diploma.id == diploma_id).first()
     if not diploma:
@@ -341,7 +341,7 @@ def delete_diploma(diploma_id: str, db: Session = Depends(get_db)):
 # VERIFICATION & DOWNLOAD
 # =========================
 
-@router.get("verify-on-chain/{doc_hash}")
+@router.get("/verify-on-chain/{doc_hash}")
 def verify_on_chain(doc_hash: str):
     try:
         on_chain_data = contract.functions.getDiploma(doc_hash).call()
@@ -361,7 +361,7 @@ def verify_on_chain(doc_hash: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("{diploma_id}/verify-and-download")
+@router.post("/{diploma_id}/verify-and-download")
 async def verify_and_download_diploma(diploma_id: str, db: Session = Depends(get_db)):
     diploma = db.query(Diploma).filter(Diploma.id == diploma_id).first()
     if not diploma:

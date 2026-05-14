@@ -143,7 +143,7 @@ class UserData(BaseModel):
 # =========================
 # REGISTER
 # =========================
-@router.post("register")
+@router.post("/register")
 def register(payload: RegisterRequest, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == payload.email).first()
     if existing_user:
@@ -188,7 +188,7 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
 # =========================
 # LOGIN
 # =========================
-@router.post("login")
+@router.post("/login")
 def login(payload: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == payload.email).first()
     is_student = False

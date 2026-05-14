@@ -90,7 +90,7 @@ def send_otp_to_console(phone_number: str, otp_code: str):
 # REQUEST NEW OTP
 # =========================
 
-@router.post("otp-request")
+@router.post("/otp-request")
 def request_new_otp(
     payload: OTPRequest, 
     background_tasks: BackgroundTasks, 
@@ -120,7 +120,7 @@ def request_new_otp(
 # VERIFY OTP
 # =========================
 
-@router.post("verify-otp")
+@router.post("/verify-otp")
 def verify_otp_and_activate(payload: OTPVerification, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.id == payload.student_id).first()
     if not student:
@@ -154,7 +154,7 @@ def verify_otp_and_activate(payload: OTPVerification, db: Session = Depends(get_
 # DELETE WALLET
 # =========================
 
-@router.delete("remove/{student_id}")
+@router.delete("/remove/{student_id}")
 def delete_wallet(student_id: str, db: Session = Depends(get_db)):
     wallet = db.query(Wallet).filter(Wallet.student_id == student_id).first()
     if not wallet:
