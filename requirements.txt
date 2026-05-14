@@ -13,3 +13,4 @@ web3
 eth-account
 flask
 pymysql
+argon2-cffi
