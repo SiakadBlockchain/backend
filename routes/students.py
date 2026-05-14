@@ -154,7 +154,7 @@ def register_student(
 # =========================
 # GET ALL STUDENTS
 # =========================
-@router.get("/")
+@router.get("")
 def get_students(page: int = 1, limit: int = 10, db: Session = Depends(get_db)):
     skip = (page - 1) * limit
     total = db.query(Student).count()
