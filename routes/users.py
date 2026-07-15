@@ -1,5 +1,3 @@
-import hashlib
-
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from databases.connection import SessionLocal

@@ -1,0 +1,52 @@
+[
+  {
+    "total_data": 1,
+    "timestamp": "2026-05-22T11:00:22.353Z",
+    "metrics": {
+      "total_duration_sec": 8.84,
+      "registration_duration_sec": 0.4,
+      "diploma_issuance_duration_sec": 0.6,
+      "blockchain_validation_duration_sec": 0.45
+    }
+  },
+  {
+    "total_data": 10,
+    "timestamp": "2026-05-22T11:03:43.630Z",
+    "metrics": {
+      "total_duration_sec": 71.57,
+      "registration_duration_sec": 3.08,
+      "diploma_issuance_duration_sec": 43.91,
+      "blockchain_validation_duration_sec": 18.84
+    }
+  },
+  {
+    "total_data": 20,
+    "timestamp": "2026-05-22T11:08:04.046Z",
+    "metrics": {
+      "total_duration_sec": 146.04,
+      "registration_duration_sec": 4.99,
+      "diploma_issuance_duration_sec": 91.81,
+      "blockchain_validation_duration_sec": 42.87
+    }
+  },
+  {
+    "total_data": 50,
+    "timestamp": "2026-05-22T11:15:11.020Z",
+    "metrics": {
+      "total_duration_sec": 353.87,
+      "registration_duration_sec": 16.37,
+      "diploma_issuance_duration_sec": 231.88,
+      "blockchain_validation_duration_sec": 99.27
+    }
+  },
+  {
+    "total_data": 100,
+    "timestamp": "2026-05-23T15:54:06.365Z",
+    "metrics": {
+      "total_duration_sec": 634.58,
+      "registration_duration_sec": 32.73,
+      "diploma_issuance_duration_sec": 497.6,
+      "blockchain_validation_duration_sec": 98.12
+    }
+  }
+]
